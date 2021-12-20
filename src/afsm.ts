@@ -69,6 +69,10 @@ export class FSMBase extends EventEmitter {
       option.parent.on(FSM_EVENT.STOP, () => this.stop(NaN));
     }
   }
+  switch(...args: any[]) {
+    if (this.running) this.stop();
+    else this.start(...args);
+  }
   start(...args: any[]) {
     if (this.option?.parent && !this.option.parent.running) {
       return false;
