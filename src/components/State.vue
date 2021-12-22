@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { NCard, NStep, NSteps, NButton, NButtonGroup, NCheckbox, useMessage } from 'naive-ui';
-import { computed, reactive, ref } from 'vue';
-import { FSMBase, FSM_EVENT } from '../afsm';
+import { reactive } from 'vue';
+import { FSMBase, FSM_EVENT ,FSM_STATE} from '../afsm';
 const message = useMessage();
 const config = reactive({ name: "afsm", quickStart: false, quickStop: false });
 const fsm = new FSMBase(config);
-fsm.on(FSM_EVENT.START, () => message.info(FSM_EVENT.START));
-fsm.on(FSM_EVENT.STOP, () => message.info(FSM_EVENT.STOP));
-fsm.on(FSM_EVENT.START_SUCCESS, () => message.success(FSM_EVENT.START_SUCCESS));
-fsm.on(FSM_EVENT.START_FAILED, () => message.error(FSM_EVENT.START_FAILED));
-fsm.on(FSM_EVENT.STOP_SUCCESS, () => message.success(FSM_EVENT.STOP_SUCCESS));
-fsm.on(FSM_EVENT.STOP_FAILED, () => message.error(FSM_EVENT.STOP_FAILED));
-const current = computed(() => fsm.state.value + 1);
+for (let i = 0; i < 2; i++) {
+  fsm.on(FSM_EVENT[i], () => message.info(FSM_EVENT[i]));
+  fsm.on(FSM_EVENT[i] + FSM_EVENT[2], () => message.success(FSM_EVENT[i] + FSM_EVENT[2]));
+  fsm.on(FSM_EVENT[i] + FSM_EVENT[3], () => message.error(FSM_EVENT[i] + FSM_EVENT[3]));
+}
 </script>
 
 <template>
@@ -20,11 +18,11 @@ const current = computed(() => fsm.state.value + 1);
       <n-checkbox v-model:checked="config.quickStart">quickStart</n-checkbox>
       <n-checkbox v-model:checked="config.quickStop">quickStop</n-checkbox>
     </template>
-    <n-steps :current="current" status="process">
-      <n-step title="Idle" :status="current == 1 ? 'process' : 'wait'" />
-      <n-step title="Starting" :status="current == 2 ? 'process' : 'wait'" />
-      <n-step title="Running" :status="current == 3 ? 'process' : 'wait'" />
-      <n-step title="Stopping" :status="current == 4 ? 'process' : 'wait'" />
+    <n-steps :current="fsm.state.value" status="process">
+      <n-step title="Idle" :status="fsm.state.value == FSM_STATE.IDLE ? 'process' : 'wait'" />
+      <n-step title="Starting" :status="fsm.state.value == FSM_STATE.STARTING ? 'process' : 'wait'" />
+      <n-step title="Running" :status="fsm.state.value == FSM_STATE.RUNNING ? 'process' : 'wait'" />
+      <n-step title="Stopping" :status="fsm.state.value == FSM_STATE.STOPPING ? 'process' : 'wait'" />
     </n-steps>
     <template #action>
       <n-button-group>
