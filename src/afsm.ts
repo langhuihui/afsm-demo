@@ -41,12 +41,14 @@ export class FSMBase extends EventEmitter {
     return !(this.option?.quickStart === false);
   }
   name: string;
+  children : FSMBase[] = [];
   constructor(public option?: FSMConfig) {
     super();
     this.name = option?.name || this.constructor.name;
     if (option?.parent) {
       // 级联关闭
       option.parent.on("stop", () => this.stop(NaN));
+      option.parent.children.push(this)
     }
   }
   switch(...args: any[]) {
@@ -83,22 +85,6 @@ export class FSMBase extends EventEmitter {
   private transition(x: FSM_EVENT.start | FSM_EVENT.stop, y: 0 | FSM_EVENT.Success | FSM_EVENT.Failed, ...args: any[]) {
     const from = this.state.value;
     const event = FSM_EVENT[x] + (y ? FSM_EVENT[y] : "")
-// const Transitions = [];
-// Transitions[0b00] = {
-//   [FSMEvent[0b00] + FSMEvent[0b10]]: 0b10,
-//   [FSMEvent[0b00] + FSMEvent[0b11]]: 0b11,
-// };
-// Transitions[0b01] = {
-//   [FSMEvent[0b01] + FSMEvent[0b10]]: 0b11,
-//   [FSMEvent[0b01] + FSMEvent[0b11]]: 0b10,
-// };
-// Transitions[0b10] = {
-//   [FSMEvent[0b01]]: 0b01
-// };
-// Transitions[0b11] = {
-//   [FSMEvent[0b00]]: 0b00
-// };
-// if(Transitions[from][event]){ }
     if ((from ^ x) == (y ? 0 : 3)) {
       this.state.value = x ^ y;
       this.timestamps[this.state.value] = Date.now();

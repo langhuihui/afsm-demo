@@ -13,7 +13,7 @@ for (let i = 0; i < 2; i++) {
 </script>
 
 <template>
-  <n-card title="单个原子状态机" style="width: 600px;">
+  <n-card title="单个原子状态机">
     <template #header-extra>
       <n-checkbox v-model:checked="config.quickStart">quickStart</n-checkbox>
       <n-checkbox v-model:checked="config.quickStop">quickStop</n-checkbox>
